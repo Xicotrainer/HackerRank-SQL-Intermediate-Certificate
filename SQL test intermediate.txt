@@ -1,0 +1,54 @@
+SELECT 
+    c.country_name, 
+    COUNT(iv.id), 
+    ROUND(AVG(iv.total_price), 6)
+FROM
+    country c, 
+    city ci, 
+    customer cu, 
+    invoice iv
+WHERE
+    c.id = ci.country_id and 
+    ci.id = cu.city_id and
+    cu.id = iv.customer_id
+    
+GROUP BY 
+    c.country_name
+
+HAVING
+    AVG(iv.total_price) >= 
+    (
+        SELECT
+            AVG(total_price)
+        FROM
+            invoice
+    );
+
+
+---------------------------
+
+SELECT 
+    ci.city_name,
+    p.product_name,
+    ROUND(SUM(im.price * im.quantity),2)
+
+FROM
+    city ci, 
+    customer cu, 
+    invoice iv,
+    invoice_item im,
+    product p
+WHERE
+    ci.id = cu.city_id and 
+    cu.id = iv.customer_id and
+    iv.id = im.invoice_id and
+    p.id = im.product_id
+    
+GROUP BY 
+    ci.city_name,
+    p.product_name
+    
+ORDER BY
+    SUM(im.price * im.quantity) DESC,
+    ci.city_name,
+    p.product_name;
